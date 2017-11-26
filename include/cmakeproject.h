@@ -20,6 +20,14 @@ class CmakeProject {
 public:
   static CmakeProject createBaseProject(
     std::string name,
+    std::string projectType,
+    BaseCmakeSettings baseSettings,
+    std::vector<std::string> includeFiles,
+    std::vector<std::string> sourceFiles
+  );
+
+  static CmakeProject createBaseProjectWithSubProjects(
+    std::string name,
     BaseCmakeSettings baseSettings,
     std::vector<CmakeProject> subProjects
   );
@@ -30,6 +38,7 @@ public:
     std::vector<std::string> includeFiles,
     std::vector<std::string> sourceFiles
   );
+  
 
   const std::string& name() const;
   std::optional<std::string> projectType() const;

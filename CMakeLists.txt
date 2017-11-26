@@ -21,11 +21,13 @@ endif ()
 
 set (CMAKE_GENERATOR_INCLUDE
   "include/cmakeproject.h"
+  "include/cmakegenerator.h"
 )
 
 set (CMAKE_GENERATOR_SRC
   "src/main.cpp"
   "src/cmakeproject.cpp"
+  "src/cmakegenerator.cpp"
 )
 
 add_executable (cmake_generator ${CMAKE_GENERATOR_INCLUDE} ${CMAKE_GENERATOR_SRC})

@@ -18,8 +18,26 @@ const std::string& BaseCmakeSettings::cppVersion() const {
 
 CmakeProject CmakeProject::createBaseProject(
   std::string name,
+  std::string projectType,
   BaseCmakeSettings baseSettings,
-  std::vector<CmakeProject> subProjects) {
+  std::vector<std::string> includeFiles,
+  std::vector<std::string> sourceFiles
+) {
+  return {
+    name,
+    projectType,
+    std::make_optional(baseSettings),
+    {},
+    includeFiles,
+    sourceFiles
+  };
+}
+
+CmakeProject CmakeProject::createBaseProjectWithSubProjects(
+  std::string name,
+  BaseCmakeSettings baseSettings,
+  std::vector<CmakeProject> subProjects
+) {
   return {
     name,
     std::nullopt,
@@ -34,7 +52,8 @@ CmakeProject CmakeProject::createSubProject(
   std::string name,
   std::string projectType,
   std::vector<std::string> includeFiles,
-  std::vector<std::string> sourceFiles) {
+  std::vector<std::string> sourceFiles
+) {
   return {
     name,
     std::make_optional(projectType),
