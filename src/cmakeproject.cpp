@@ -25,7 +25,7 @@ CmakeProject CmakeProject::createBaseProject(
 ) {
   return {
     name,
-    projectType,
+    std::make_optional(projectType),
     std::make_optional(baseSettings),
     {},
     includeFiles,

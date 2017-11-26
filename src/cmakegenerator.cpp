@@ -85,7 +85,7 @@ CmakeProject CmakeGenerator::run() {
 
   const auto baseSettings = BaseCmakeSettings{"Debug", projectCmakeVersion, projectCppVersion};
   if (settings_.subProjectNames().size() > 0) {
-    std::vector<CmakeProject> subProjects = std::vector<CmakeProject>(settings_.subProjectNames().size());
+    std::vector<CmakeProject> subProjects = {};
     for (const auto& projectName : settings_.subProjectNames()) {
       ioHandler_.write(SUB_PROJECT_QUESTION_PRE + projectName + SUB_PROJECT_QUESTION_SUB);
       if (confirmationInput(ioHandler_)) {
