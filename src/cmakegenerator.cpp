@@ -1,5 +1,6 @@
 #include "../include/cmakegenerator.h"
 #include "../include/cmakeproject.h"
+#include "../include/fileutils.h"
 #include <algorithm>
 
 namespace {
@@ -42,7 +43,7 @@ bool confirmationInput(IoHandler& ioHandler) {
 CmakeProject createSubProject(IoHandler& ioHandler, const std::string& projectName) {
   ioHandler.write(PROJECT_TYPE_QUESTION);
   const auto projectType = getProjectType(ioHandler);
-  return CmakeProject::createSubProject(projectName, projectType, {}, {});
+  return CmakeProject::createSubProject(projectName, projectType, file_utils::getIncludeFiles(projectName), file_utils::getSourceFiles(projectName));
 }
 
 }

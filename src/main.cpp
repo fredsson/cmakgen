@@ -1,6 +1,8 @@
 #include <iostream>
 #include "../include/cmakeproject.h"
 #include "../include/cmakegenerator.h"
+#include "../include/fileutils.h"
+
 
 class StdIoHandler : public IoHandler {
 public:
@@ -24,13 +26,22 @@ int main(int argc, char *argv[]) {
 
   auto ioHandler = StdIoHandler{};
 
-  const auto command = std::string(argv[1]); 
+  const auto command = std::string(argv[1]);
   if (command == "--watch" || command == "-w") {
     std::cout << "received watch command\n";
   } else if (command == "--gen" || command == "-g") {
-    auto generator = CmakeGenerator{ioHandler, {"test", "2.8.9", "c++11", {"test", "cool test2"}}};
+    auto generator = CmakeGenerator{ioHandler, {"test", "2.8.9", "c++11", file_utils::getSubProjectFolders()}};
     const auto project = generator.run();
     std::cout << "created project with name " << project.name() << "\n";
+    for (const auto& subProject : project.subProjects()) {
+      for (const auto& includeFile : subProject.includeFiles()) {
+        std::cout << "file: " << includeFile << "\n";
+      }
+
+      for (const auto& sourceFile : subProject.sourceFiles()) {
+        std::cout << "file: " << sourceFile << "\n";
+      }
+    }
   } else if (command == "--dep" || command == "-d") {
     std::cout << "received dep command\n";
   } else {
