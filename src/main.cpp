@@ -2,6 +2,7 @@
 #include "../include/cmakeproject.h"
 #include "../include/cmakegenerator.h"
 #include "../include/fileutils.h"
+#include "../include/cmakefile.h"
 
 
 class StdIoHandler : public IoHandler {
@@ -33,13 +34,17 @@ int main(int argc, char *argv[]) {
     auto generator = CmakeGenerator{ioHandler, {"test", "2.8.9", "c++11", file_utils::getSubProjectFolders()}};
     const auto project = generator.run();
     std::cout << "created project with name " << project.name() << "\n";
+    auto baseFile = file_utils::createCmakeFile();
+    if (baseFile) {
+      CmakeFile::save(baseFile, project);
+      baseFile->close();
+    }
+    
     for (const auto& subProject : project.subProjects()) {
-      for (const auto& includeFile : subProject.includeFiles()) {
-        std::cout << "file: " << includeFile << "\n";
-      }
-
-      for (const auto& sourceFile : subProject.sourceFiles()) {
-        std::cout << "file: " << sourceFile << "\n";
+      auto file = file_utils::createCmakeFile(subProject.name());
+      if (file) {
+        CmakeFile::save(file, subProject);
+        file->close();
       }
     }
   } else if (command == "--dep" || command == "-d") {
