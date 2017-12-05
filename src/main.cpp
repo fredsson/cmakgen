@@ -4,6 +4,8 @@
 #include "../include/fileutils.h"
 #include "../include/cmakefile.h"
 
+#include <map>
+
 
 class StdIoHandler : public IoHandler {
 public:
@@ -19,10 +21,34 @@ public:
   }
 };
 
+void generateCmake(IoHandler& ioHandler, const std::string& defaultCmake, const std::string& defaultCppVersion) {
+  auto generator = CmakeGenerator{ioHandler, {file_utils::currentDirName(), defaultCmake, defaultCppVersion, file_utils::getSubProjectFolders()}};
+  const auto project = generator.run();
+  auto baseFile = file_utils::createCmakeFile();
+  if (baseFile) {
+    CmakeFile::save(baseFile, project);
+    baseFile->close();
+  }
+    
+  for (const auto& subProject : project.subProjects()) {
+    auto file = file_utils::createCmakeFile(subProject.name());
+    if (file) {
+      CmakeFile::save(file, subProject);
+      file->close();
+    }
+  }
+}
+
 int main(int argc, char *argv[]) {
   if (argc < 2) {
     std::cout << "no arguments provided\n";
     return 0;
+  }
+
+  std::map<std::string, std::string> options;
+  for (int i = 2; i < argc; i++) {
+    const auto option = std::string(argv[i]);
+      options.insert(std::make_pair(option.substr(0, option.find("=")), option.substr(option.find("=") + 1)));
   }
 
   auto ioHandler = StdIoHandler{};
@@ -31,22 +57,9 @@ int main(int argc, char *argv[]) {
   if (command == "--watch" || command == "-w") {
     std::cout << "received watch command\n";
   } else if (command == "--gen" || command == "-g") {
-    auto generator = CmakeGenerator{ioHandler, {"test", "2.8.9", "c++11", file_utils::getSubProjectFolders()}};
-    const auto project = generator.run();
-    std::cout << "created project with name " << project.name() << "\n";
-    auto baseFile = file_utils::createCmakeFile();
-    if (baseFile) {
-      CmakeFile::save(baseFile, project);
-      baseFile->close();
-    }
-    
-    for (const auto& subProject : project.subProjects()) {
-      auto file = file_utils::createCmakeFile(subProject.name());
-      if (file) {
-        CmakeFile::save(file, subProject);
-        file->close();
-      }
-    }
+    auto cmakeIt = options.find("--cmake");
+    auto cppIt = options.find("--cpp");
+    generateCmake(ioHandler, (cmakeIt != options.end() ? cmakeIt->second : "3.10.0"), (cppIt != options.end() ? cppIt->second : "c++11"));
   } else if (command == "--dep" || command == "-d") {
     std::cout << "received dep command\n";
   } else {

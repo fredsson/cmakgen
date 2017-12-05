@@ -10,6 +10,7 @@ namespace file_utils {
   std::shared_ptr<std::ofstream> createCmakeFile(const std::string& subFolderName);
   std::vector<std::string> getIncludeFiles(const std::string& subFolderName);
   std::vector<std::string> getSourceFiles(const std::string& subFolderName);
+  std::string currentDirName();
   std::vector<std::string> getSubProjectFolders();
 }
 
