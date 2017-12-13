@@ -64,23 +64,6 @@ namespace CmakeFile {
       // dependancies
       
     }
-    
-
-
-
-
-    // cmake version
-
-    // project name
-
-    // build type
-
-    // cpp version
-
-    // (include files / source files) or (sub projects)
-
-    // exe / lib
-    
   }
 
   CmakeProject load(std::shared_ptr<std::ifstream> fileStream) {

@@ -3,8 +3,8 @@
 #include "../include/cmakegenerator.h"
 #include "../include/fileutils.h"
 #include "../include/cmakefile.h"
-
 #include <map>
+#include "../include/commandlineutils.h"
 
 
 class StdIoHandler : public IoHandler {
@@ -20,6 +20,12 @@ public:
     return input;
   }
 };
+
+void buildProject() {
+  // make sure _build folder exists
+  // update the cmake files here
+  commandline_utils::executeBuildCommand();
+}
 
 void generateCmake(IoHandler& ioHandler, const std::string& defaultCmake, const std::string& defaultCppVersion) {
   auto generator = CmakeGenerator{ioHandler, {file_utils::currentDirName(), defaultCmake, defaultCppVersion, file_utils::getSubProjectFolders()}};
@@ -54,8 +60,8 @@ int main(int argc, char *argv[]) {
   auto ioHandler = StdIoHandler{};
 
   const auto command = std::string(argv[1]);
-  if (command == "--watch" || command == "-w") {
-    std::cout << "received watch command\n";
+  if (command == "--build" || command == "-b") {
+    buildProject();
   } else if (command == "--gen" || command == "-g") {
     auto cmakeIt = options.find("--cmake");
     auto cppIt = options.find("--cpp");

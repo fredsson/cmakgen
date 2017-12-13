@@ -27,6 +27,7 @@ set (CMAKE_GENERATOR_INCLUDE
   "include/cmakegenerator.h"
   "include/cmakefile.h"
   "include/fileutils.h"
+  "include/commandlineutils.h"
 )
 
 set (CMAKE_GENERATOR_SRC
@@ -35,6 +36,7 @@ set (CMAKE_GENERATOR_SRC
   "src/cmakegenerator.cpp"
   "src/cmakefile.cpp"
   "src/fileutils.cpp"
+  "src/commandlineutils.cpp"
 )
 
 add_executable (cmake_generator ${CMAKE_GENERATOR_INCLUDE} ${CMAKE_GENERATOR_SRC})
