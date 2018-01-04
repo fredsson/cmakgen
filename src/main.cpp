@@ -22,13 +22,21 @@ public:
 };
 
 void buildProject() {
+  file_utils::createDir("_build");
+
+  const auto file = std::shared_ptr<std::ifstream>(new std::ifstream("CMakeLists_test.txt"));
+  const auto project = CmakeFile::load(file, false);
+  if (project.has_value()) {
+    CmakeFile::save(file_utils::createCmakeFile(), project.value());
+  }
+
   // make sure _build folder exists
   // update the cmake files here
-  commandline_utils::executeBuildCommand();
+  //commandline_utils::executeBuildCommand();
 }
 
 void generateCmake(IoHandler& ioHandler, const std::string& defaultCmake, const std::string& defaultCppVersion) {
-  auto generator = CmakeGenerator{ioHandler, {file_utils::currentDirName(), defaultCmake, defaultCppVersion, file_utils::getSubProjectFolders()}};
+  auto generator = CmakeGenerator{ioHandler, {file_utils::currentDirName(), defaultCmake, defaultCppVersion, file_utils::getSubProjectDirectories()}};
   const auto project = generator.run();
   auto baseFile = file_utils::createCmakeFile();
   if (baseFile) {

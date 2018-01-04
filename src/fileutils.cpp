@@ -57,11 +57,15 @@ namespace file_utils {
     return getFiles(filesystem::current_path().append(subFolderName + "/src"), ".cpp");
   }
 
+  void createDir(const std::string& name) {
+    filesystem::create_directory(filesystem::current_path().append(name));
+  }
+
   std::string currentDirName() {
     return filesystem::current_path().filename().generic_string();
   }
 
-  std::vector<std::string> getSubProjectFolders() {
+  std::vector<std::string> getSubProjectDirectories() {
     const auto currentPath = filesystem::current_path();
     return searchForDirectories(filesystem::current_path(), containsSourceDirectory);
   }
