@@ -43,9 +43,13 @@ public:
   const std::string& name() const;
   std::optional<std::string> projectType() const;
   std::optional<BaseCmakeSettings> baseSettings() const;
-  const std::vector<CmakeProject>& subProjects() const;
   const std::vector<std::string>& includeFiles() const;
   const std::vector<std::string>& sourceFiles() const;
+  const std::vector<CmakeProject>& subProjects() const;
+  std::vector<CmakeProject>& subProjects();
+
+  void setIncludeFiles(std::vector<std::string> files);
+  void setSourceFiles(std::vector<std::string> files);
   
 private:
   CmakeProject(

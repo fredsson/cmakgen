@@ -21,18 +21,31 @@ public:
   }
 };
 
+void updateProjectFiles(CmakeProject& project) {
+  if (project.projectType().has_value()) {
+    project.setIncludeFiles(file_utils::getIncludeFiles(project.name()));
+    project.setSourceFiles(file_utils::getSourceFiles(project.name()));
+  }
+
+  for (auto& subProject : project.subProjects()) {
+    if (subProject.projectType().has_value()) {
+      subProject.setIncludeFiles(file_utils::getIncludeFiles(subProject.name()));
+      subProject.setSourceFiles(file_utils::getIncludeFiles(subProject.name()));
+    }
+  }
+}
+
 void buildProject() {
   file_utils::createDir("_build");
 
   const auto file = std::shared_ptr<std::ifstream>(new std::ifstream("CMakeLists_test.txt"));
   const auto project = CmakeFile::load(file, false);
   if (project.has_value()) {
-    CmakeFile::save(file_utils::createCmakeFile(), project.value());
+    auto loadedProject = project.value();
+    updateProjectFiles(loadedProject);
+    CmakeFile::save(file_utils::createCmakeFile(), loadedProject);
   }
-
-  // make sure _build folder exists
-  // update the cmake files here
-  //commandline_utils::executeBuildCommand();
+  commandline_utils::executeBuildCommand();
 }
 
 void generateCmake(IoHandler& ioHandler, const std::string& defaultCmake, const std::string& defaultCppVersion) {

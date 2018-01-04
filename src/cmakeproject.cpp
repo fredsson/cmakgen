@@ -90,9 +90,6 @@ std::optional<std::string> CmakeProject::projectType() const {
 std::optional<BaseCmakeSettings> CmakeProject::baseSettings() const {
   return baseSettings_;
 }
-const std::vector<CmakeProject>& CmakeProject::subProjects() const {
-  return subProjects_;
-}
 
 const std::vector<std::string>& CmakeProject::includeFiles() const {
   return includeFiles_;
@@ -100,4 +97,20 @@ const std::vector<std::string>& CmakeProject::includeFiles() const {
 
 const std::vector<std::string>& CmakeProject::sourceFiles() const {
   return sourceFiles_;
+}
+
+const std::vector<CmakeProject>& CmakeProject::subProjects() const {
+  return subProjects_;
+}
+
+std::vector<CmakeProject>& CmakeProject::subProjects() {
+  return subProjects_;
+}
+
+void CmakeProject::setIncludeFiles(std::vector<std::string> files) {
+  includeFiles_ = files;
+}
+
+void CmakeProject::setSourceFiles(std::vector<std::string> files) {
+  sourceFiles_ = files;
 }

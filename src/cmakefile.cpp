@@ -97,11 +97,10 @@ void save(std::shared_ptr<std::ofstream> fileStream, const CmakeProject& project
     }
 
     // dependancies
+  }
 
-    // create cmake files for sub projects
-    for (const auto& subProject : project.subProjects()) {
-      CmakeFile::save(file_utils::createCmakeFile(subProject.name()), subProject);
-    }
+  for (const auto& subProject : project.subProjects()) {
+    CmakeFile::save(file_utils::createCmakeFile(subProject.name()), subProject);
   }
 }
 
