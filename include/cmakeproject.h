@@ -13,20 +13,23 @@ public:
     std::string projectType,
     BaseCmakeSettings baseSettings,
     std::vector<std::string> includeFiles,
-    std::vector<std::string> sourceFiles
+    std::vector<std::string> sourceFiles,
+    std::vector<CmakeLibrary> libraries
   );
 
   static CmakeProject createBaseProjectWithSubProjects(
     std::string name,
     BaseCmakeSettings baseSettings,
-    std::vector<CmakeProject> subProjects
+    std::vector<CmakeProject> subProjects,
+    std::vector<CmakeLibrary> libraries
   );
 
   static CmakeProject createSubProject(
     std::string name,
     std::string projectType,
     std::vector<std::string> includeFiles,
-    std::vector<std::string> sourceFiles
+    std::vector<std::string> sourceFiles,
+    std::vector<CmakeLibrary> libraries
   );
   
   const std::string& name() const;
@@ -36,6 +39,7 @@ public:
   const std::vector<std::string>& sourceFiles() const;
   const std::vector<CmakeProject>& subProjects() const;
   std::vector<CmakeProject>& subProjects();
+  const std::vector<CmakeLibrary> libraries() const;
 
   void setIncludeFiles(std::vector<std::string> files);
   void setSourceFiles(std::vector<std::string> files);
@@ -47,7 +51,8 @@ private:
     std::optional<BaseCmakeSettings> baseSettings,
     std::vector<CmakeProject> subProjects,
     std::vector<std::string> includeFiles,
-    std::vector<std::string> sourceFiles
+    std::vector<std::string> sourceFiles,
+    std::vector<CmakeLibrary> libraries
   );
 
   std::string name_;
@@ -56,6 +61,7 @@ private:
   std::vector<CmakeProject> subProjects_;
   std::vector<std::string> includeFiles_;
   std::vector<std::string> sourceFiles_;
+  std::vector<CmakeLibrary> libraries_;
 };
 
 #endif

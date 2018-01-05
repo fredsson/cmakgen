@@ -5,7 +5,8 @@ CmakeProject CmakeProject::createBaseProject(
   std::string projectType,
   BaseCmakeSettings baseSettings,
   std::vector<std::string> includeFiles,
-  std::vector<std::string> sourceFiles
+  std::vector<std::string> sourceFiles,
+  std::vector<CmakeLibrary> libraries
 ) {
   return {
     name,
@@ -13,14 +14,16 @@ CmakeProject CmakeProject::createBaseProject(
     std::make_optional(baseSettings),
     {},
     includeFiles,
-    sourceFiles
+    sourceFiles,
+    libraries
   };
 }
 
 CmakeProject CmakeProject::createBaseProjectWithSubProjects(
   std::string name,
   BaseCmakeSettings baseSettings,
-  std::vector<CmakeProject> subProjects
+  std::vector<CmakeProject> subProjects,
+  std::vector<CmakeLibrary> libraries
 ) {
   return {
     name,
@@ -28,7 +31,8 @@ CmakeProject CmakeProject::createBaseProjectWithSubProjects(
     std::make_optional(baseSettings),
     subProjects,
     {},
-    {}
+    {},
+    libraries
   };
 }
 
@@ -36,7 +40,8 @@ CmakeProject CmakeProject::createSubProject(
   std::string name,
   std::string projectType,
   std::vector<std::string> includeFiles,
-  std::vector<std::string> sourceFiles
+  std::vector<std::string> sourceFiles,
+  std::vector<CmakeLibrary> libraries
 ) {
   return {
     name,
@@ -44,7 +49,8 @@ CmakeProject CmakeProject::createSubProject(
     std::nullopt,
     {},
     includeFiles,
-    sourceFiles
+    sourceFiles,
+    libraries
   };
 }
 
@@ -54,13 +60,15 @@ CmakeProject::CmakeProject(
   std::optional<BaseCmakeSettings> baseSettings,
   std::vector<CmakeProject> subProjects,
   std::vector<std::string> includeFiles,
-  std::vector<std::string> sourceFiles
+  std::vector<std::string> sourceFiles,
+  std::vector<CmakeLibrary> libraries
 ) : name_(name),
  projectType_(projectType),
  baseSettings_(baseSettings),
  subProjects_(subProjects),
  includeFiles_(includeFiles),
- sourceFiles_(sourceFiles) {
+ sourceFiles_(sourceFiles),
+ libraries_(libraries) {
 }
 
 const std::string& CmakeProject::name() const {

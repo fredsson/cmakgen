@@ -1,5 +1,6 @@
 #include "../include/cmakefile.h"
 #include "../include/fileutils.h"
+#include "../include/cmakelibrary.h"
 #include <iostream>
 #include <fstream>
 #include <algorithm>
@@ -21,6 +22,15 @@ const std::regex SOURCE_FILE_EXPRESSION = std::regex(".*\"src/(.*)\".*");
 const std::regex FILES_END_EXPRESSION = std::regex(".*\\).*");
 const std::regex LIBRARY_EXPRESSION = std::regex("add_library.*");
 const std::regex EXE_EXPRESSION = std::regex("add_executable.*");
+const std::regex FIND_PACKAGE_LIBRARY_EXPRESSION = std::regex("find_package.*");
+
+std::vector<std::string> split(const std::string& subject) {
+  static const std::regex re{"\\s+"};
+  return {
+    std::sregex_token_iterator(subject.begin(), subject.end(), re, -1), 
+    std::sregex_token_iterator()
+  };
+}
 
 std::optional<std::string> extractWithExpression(const std::string& content, const std::regex& expression) {
   try {
@@ -31,6 +41,49 @@ std::optional<std::string> extractWithExpression(const std::string& content, con
   } catch (const std::regex_error& e) {
     std::cout << "regex_error caught: " << e.what() << " code: " << e.code() << '\n';
     return std::nullopt;
+  }
+
+  return std::nullopt;
+}
+
+std::optional<CmakeLibrary> extractLibrary(const std::string& content) {
+  
+  const std::regex parameterRegex = std::regex("find_package.*\\((.*)\\)");
+  const std::regex versionRegex = std::regex("(\\d+).*");
+
+  std::optional<std::string> extractedParameters = extractWithExpression(content, parameterRegex);
+  if (extractedParameters.has_value()) {
+    const auto parameters = split(extractedParameters.value());
+    if (parameters.empty()) {
+      std::cout << "could not find any parameters for library\n";
+      return std::nullopt;
+    }
+
+    std::string name = parameters[0];
+    std::vector<std::string> preOptions = {};
+    std::vector<std::string> options = {};
+    std::vector<std::string> modules = {};
+    
+    bool componentsAdded = false;
+    for (auto i = 1; i < parameters.size(); i++) {
+      if (componentsAdded) {
+        options.push_back(parameters[i]);
+      } else if (std::regex_match(parameters[1], versionRegex) 
+        || parameters[i].find("EXACT") != std::string::npos
+        || parameters[i].find("QUIET") != std::string::npos
+        || parameters[i].find("REQUIRED") != std::string::npos
+      ) {
+        preOptions.push_back(parameters[i]);
+      } else if (parameters[i].find("CONFIG") != std::string::npos || parameters[i].find("NO_MODULE") != std::string::npos) {
+        componentsAdded = true;
+        options.push_back(parameters[i]);
+      } else {
+        modules.push_back(parameters[i]);
+      }
+    }
+
+    return CmakeLibrary(name, preOptions, options, modules, CmakeLibrary::LibraryType::PACKAGE);
+      
   }
 
   return std::nullopt;
@@ -118,6 +171,7 @@ std::optional<CmakeProject> load(std::shared_ptr<std::ifstream> fileStream, bool
   std::vector<std::string> includeFiles = {};
   std::vector<std::string> sourceFiles = {};
   std::vector<std::string> subProjectNames = {};
+  std::vector<CmakeLibrary> libraries = {};
 
   bool addIncludeFiles = false;
   bool addSourceFiles = false;
@@ -184,6 +238,13 @@ std::optional<CmakeProject> load(std::shared_ptr<std::ifstream> fileStream, bool
       addSourceFiles = false;
       continue;
     }
+
+    if (std::regex_match(content, FIND_PACKAGE_LIBRARY_EXPRESSION)) {
+      const auto library = extractLibrary(content);
+      if (library.has_value()) {
+        libraries.push_back(library.value());
+      }
+    }
   }
 
   if (!name.has_value()) {
@@ -203,7 +264,7 @@ std::optional<CmakeProject> load(std::shared_ptr<std::ifstream> fileStream, bool
   if (!hasParent) {
     const auto settings = BaseCmakeSettings{projectBuildType.value_or("Debug"), cmakeVersion.value_or("3.10.0"), cppVersion.value_or("c++11")};
     if (!subProjects.empty()) {
-      return CmakeProject::createBaseProjectWithSubProjects(name.value(), settings, subProjects);
+      return CmakeProject::createBaseProjectWithSubProjects(name.value(), settings, subProjects, libraries);
     }
 
     if (!projectType.has_value()) {
@@ -211,7 +272,7 @@ std::optional<CmakeProject> load(std::shared_ptr<std::ifstream> fileStream, bool
       return std::nullopt;
     }
 
-    return CmakeProject::createBaseProject(name.value(), projectType.value(), settings, includeFiles, sourceFiles);
+    return CmakeProject::createBaseProject(name.value(), projectType.value(), settings, includeFiles, sourceFiles, libraries);
   }
 
   if (!projectType.has_value()) {
@@ -219,6 +280,6 @@ std::optional<CmakeProject> load(std::shared_ptr<std::ifstream> fileStream, bool
     return std::nullopt;
   }
 
-  return CmakeProject::createSubProject(name.value(), projectType.value(), includeFiles, sourceFiles);
+  return CmakeProject::createSubProject(name.value(), projectType.value(), includeFiles, sourceFiles, libraries);
 }
 }
