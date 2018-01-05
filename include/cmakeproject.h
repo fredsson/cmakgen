@@ -3,18 +3,8 @@
 #include <string>
 #include <optional>
 #include <vector>
-
-class BaseCmakeSettings {
-public:
-  BaseCmakeSettings(std::string projectBuildType, std::string cmakeVersion, std::string cppVersion);
-  const std::string& projectBuildType() const;
-  const std::string& cmakeVersion() const;
-  const std::string& cppVersion() const;
-private:
-  std::string projectBuildType_;
-  std::string cmakeVersion_;
-  std::string cppVersion_;
-};
+#include "basecmakesettings.h"
+#include "cmakelibrary.h"
 
 class CmakeProject {
 public:
@@ -39,7 +29,6 @@ public:
     std::vector<std::string> sourceFiles
   );
   
-
   const std::string& name() const;
   std::optional<std::string> projectType() const;
   std::optional<BaseCmakeSettings> baseSettings() const;
