@@ -30,7 +30,7 @@ void updateProjectFiles(CmakeProject& project) {
   for (auto& subProject : project.subProjects()) {
     if (subProject.projectType().has_value()) {
       subProject.setIncludeFiles(file_utils::getIncludeFiles(subProject.name()));
-      subProject.setSourceFiles(file_utils::getIncludeFiles(subProject.name()));
+      subProject.setSourceFiles(file_utils::getSourceFiles(subProject.name()));
     }
   }
 }
@@ -38,7 +38,7 @@ void updateProjectFiles(CmakeProject& project) {
 void buildProject() {
   file_utils::createDir("_build");
 
-  const auto file = std::shared_ptr<std::ifstream>(new std::ifstream("CMakeLists_test.txt"));
+  const auto file = std::shared_ptr<std::ifstream>(new std::ifstream("CMakeLists.txt"));
   const auto project = CmakeFile::load(file, false);
   if (project.has_value()) {
     auto loadedProject = project.value();

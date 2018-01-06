@@ -41,11 +41,11 @@ namespace {
 
 namespace file_utils {
   std::shared_ptr<std::ofstream> createCmakeFile() {
-    const auto file = std::shared_ptr<std::ofstream>(new std::ofstream("CMakeLists_test.txt"));
+    const auto file = std::shared_ptr<std::ofstream>(new std::ofstream("CMakeLists.txt"));
     return file->is_open() ? file : nullptr;
   }
   std::shared_ptr<std::ofstream> createCmakeFile(const std::string& subFolderName) {
-    const auto file = std::shared_ptr<std::ofstream>(new std::ofstream(subFolderName + "/CMakeLists_test.txt"));
+    const auto file = std::shared_ptr<std::ofstream>(new std::ofstream(subFolderName + "/CMakeLists.txt"));
     return file->is_open() ? file : nullptr;
   }
 

@@ -99,6 +99,10 @@ std::vector<CmakeProject>& CmakeProject::subProjects() {
   return subProjects_;
 }
 
+const std::vector<CmakeLibrary> CmakeProject::libraries() const {
+  return libraries_;
+}
+
 void CmakeProject::setIncludeFiles(std::vector<std::string> files) {
   includeFiles_ = files;
 }
