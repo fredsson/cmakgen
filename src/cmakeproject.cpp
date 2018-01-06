@@ -6,7 +6,7 @@ CmakeProject CmakeProject::createBaseProject(
   BaseCmakeSettings baseSettings,
   std::vector<std::string> includeFiles,
   std::vector<std::string> sourceFiles,
-  std::vector<CmakeLibrary> libraries
+  std::vector<CmakePackage> packages
 ) {
   return {
     name,
@@ -15,7 +15,7 @@ CmakeProject CmakeProject::createBaseProject(
     {},
     includeFiles,
     sourceFiles,
-    libraries
+    packages
   };
 }
 
@@ -23,7 +23,7 @@ CmakeProject CmakeProject::createBaseProjectWithSubProjects(
   std::string name,
   BaseCmakeSettings baseSettings,
   std::vector<CmakeProject> subProjects,
-  std::vector<CmakeLibrary> libraries
+  std::vector<CmakePackage> packages
 ) {
   return {
     name,
@@ -32,7 +32,7 @@ CmakeProject CmakeProject::createBaseProjectWithSubProjects(
     subProjects,
     {},
     {},
-    libraries
+    packages
   };
 }
 
@@ -41,7 +41,7 @@ CmakeProject CmakeProject::createSubProject(
   std::string projectType,
   std::vector<std::string> includeFiles,
   std::vector<std::string> sourceFiles,
-  std::vector<CmakeLibrary> libraries
+  std::vector<CmakePackage> packages
 ) {
   return {
     name,
@@ -50,7 +50,7 @@ CmakeProject CmakeProject::createSubProject(
     {},
     includeFiles,
     sourceFiles,
-    libraries
+    packages
   };
 }
 
@@ -61,14 +61,14 @@ CmakeProject::CmakeProject(
   std::vector<CmakeProject> subProjects,
   std::vector<std::string> includeFiles,
   std::vector<std::string> sourceFiles,
-  std::vector<CmakeLibrary> libraries
+  std::vector<CmakePackage> packages
 ) : name_(name),
  projectType_(projectType),
  baseSettings_(baseSettings),
  subProjects_(subProjects),
  includeFiles_(includeFiles),
  sourceFiles_(sourceFiles),
- libraries_(libraries) {
+ packages_(packages) {
 }
 
 const std::string& CmakeProject::name() const {
@@ -99,8 +99,8 @@ std::vector<CmakeProject>& CmakeProject::subProjects() {
   return subProjects_;
 }
 
-const std::vector<CmakeLibrary> CmakeProject::libraries() const {
-  return libraries_;
+const std::vector<CmakePackage> CmakeProject::packages() const {
+  return packages_;
 }
 
 void CmakeProject::setIncludeFiles(std::vector<std::string> files) {

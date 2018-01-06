@@ -24,7 +24,7 @@ set_property(TARGET stdc++fs PROPERTY IMPORTED_LOCATION "/usr/lib/libstdc++fs.a"
 
 set (CMAKE_GENERATOR_INCLUDE
   "include/basecmakesettings.h"
-  "include/cmakelibrary.h"
+  "include/cmakepackage.h"
   "include/cmakeproject.h"
   "include/cmakegenerator.h"
   "include/cmakefile.h"
@@ -35,7 +35,7 @@ set (CMAKE_GENERATOR_INCLUDE
 set (CMAKE_GENERATOR_SRC
   "src/main.cpp"
   "src/basecmakesettings.cpp"
-  "src/cmakelibrary.cpp"
+  "src/cmakepackage.cpp"
   "src/cmakeproject.cpp"
   "src/cmakegenerator.cpp"
   "src/cmakefile.cpp"

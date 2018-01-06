@@ -1,6 +1,6 @@
 #include "../include/cmakefile.h"
 #include "../include/fileutils.h"
-#include "../include/cmakelibrary.h"
+#include "../include/cmakepackage.h"
 #include <iostream>
 #include <fstream>
 #include <algorithm>
@@ -51,7 +51,7 @@ std::optional<std::string> extractWithExpression(const std::string& content, con
   return std::nullopt;
 }
 
-std::optional<CmakeLibrary> extractLibrary(const std::string& content) {
+std::optional<CmakePackage> extractPackage(const std::string& content) {
   
   const std::regex parameterRegex = std::regex("find_package.*\\((.*)\\)");
   const std::regex versionRegex = std::regex("^(\\d+).*");
@@ -87,7 +87,7 @@ std::optional<CmakeLibrary> extractLibrary(const std::string& content) {
       }
     }
 
-    return CmakeLibrary{name, preOptions, options, modules, CmakeLibrary::LibraryType::PACKAGE};
+    return CmakePackage{name, preOptions, options, modules};
       
   }
 
@@ -125,7 +125,6 @@ void save(std::shared_ptr<std::ofstream> fileStream, const CmakeProject& project
   if (project.projectType().has_value()) {
     const auto hasIncludeFiles = !project.includeFiles().empty();
     const auto hasSourceFiles = !project.sourceFiles().empty();
-    const auto hasLibraries = !project.libraries().empty();
 
     if (hasIncludeFiles) {
       std::string includeFiles;
@@ -139,13 +138,13 @@ void save(std::shared_ptr<std::ofstream> fileStream, const CmakeProject& project
       stream << "set (SOURCE_FILES" << sourceFiles << "\n)\n\n";
     }
 
-      for (const auto& library : project.libraries()) {
-        stream << "find_package (" << library.name();
-        for (const auto& preOption : library.preOptions()) { stream << " " << preOption; }
-        for (const auto& module : library.modules()) { stream << " " << module; }
-        for (const auto& option : library.options()) { stream << " " << option; }
+      for (const auto& package : project.packages()) {
+        stream << "find_package (" << package.name();
+        for (const auto& preOption : package.preOptions()) { stream << " " << preOption; }
+        for (const auto& module : package.modules()) { stream << " " << module; }
+        for (const auto& option : package.options()) { stream << " " << option; }
         stream << ")\n";
-        stream << "include_directories (${" << upperCase(library.name()) << "_INCLUDE_DIR})\n\n";
+        stream << "include_directories (${" << upperCase(package.name()) << "_INCLUDE_DIR})\n\n";
       }
 
     const auto libraryProject = project.projectType() == "lib";
@@ -159,12 +158,14 @@ void save(std::shared_ptr<std::ofstream> fileStream, const CmakeProject& project
     if (hasSourceFiles) { stream << " ${SOURCE_FILES}"; } 
     stream << ")\n\n";
 
-    stream << "target_link_libraries (" << project.name();
-    for (const auto& library : project.libraries()) {
-      const auto upperCaseName = upperCase(library.name());
-      stream << " ${" << upperCaseName << "_LIBRARIES} ${" << upperCaseName << "_DEPENDENCIES}";
+    if (!project.packages().empty()) {
+      stream << "target_link_libraries (" << project.name();
+      for (const auto& package : project.packages()) {
+        const auto upperCaseName = upperCase(package.name());
+        stream << " ${" << upperCaseName << "_LIBRARIES} ${" << upperCaseName << "_DEPENDENCIES}";
+      }
+      stream << ")\n\n";
     }
-    stream << ")\n\n";
 
     if (libraryProject) {
       stream << "install (DIRECTORY include/ DESTINATION include/" << project.name() << ")\n";
@@ -191,7 +192,7 @@ std::optional<CmakeProject> load(std::shared_ptr<std::ifstream> fileStream, bool
   std::vector<std::string> includeFiles = {};
   std::vector<std::string> sourceFiles = {};
   std::vector<std::string> subProjectNames = {};
-  std::vector<CmakeLibrary> libraries = {};
+  std::vector<CmakePackage> libraries = {};
 
   bool addIncludeFiles = false;
   bool addSourceFiles = false;
@@ -260,7 +261,7 @@ std::optional<CmakeProject> load(std::shared_ptr<std::ifstream> fileStream, bool
     }
 
     if (std::regex_match(content, FIND_PACKAGE_LIBRARY_EXPRESSION)) {
-      auto extractedLibrary = extractLibrary(content);
+      auto extractedLibrary = extractPackage(content);
       if (extractedLibrary.has_value()) {
         auto library = extractedLibrary.value(); 
         libraries.push_back(library);

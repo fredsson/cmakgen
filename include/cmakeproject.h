@@ -4,7 +4,7 @@
 #include <optional>
 #include <vector>
 #include "basecmakesettings.h"
-#include "cmakelibrary.h"
+#include "cmakepackage.h"
 
 class CmakeProject {
 public:
@@ -14,14 +14,14 @@ public:
     BaseCmakeSettings baseSettings,
     std::vector<std::string> includeFiles,
     std::vector<std::string> sourceFiles,
-    std::vector<CmakeLibrary> libraries
+    std::vector<CmakePackage> packages
   );
 
   static CmakeProject createBaseProjectWithSubProjects(
     std::string name,
     BaseCmakeSettings baseSettings,
     std::vector<CmakeProject> subProjects,
-    std::vector<CmakeLibrary> libraries
+    std::vector<CmakePackage> packages
   );
 
   static CmakeProject createSubProject(
@@ -29,7 +29,7 @@ public:
     std::string projectType,
     std::vector<std::string> includeFiles,
     std::vector<std::string> sourceFiles,
-    std::vector<CmakeLibrary> libraries
+    std::vector<CmakePackage> packages
   );
   
   const std::string& name() const;
@@ -39,7 +39,7 @@ public:
   const std::vector<std::string>& sourceFiles() const;
   const std::vector<CmakeProject>& subProjects() const;
   std::vector<CmakeProject>& subProjects();
-  const std::vector<CmakeLibrary> libraries() const;
+  const std::vector<CmakePackage> packages() const;
 
   void setIncludeFiles(std::vector<std::string> files);
   void setSourceFiles(std::vector<std::string> files);
@@ -52,7 +52,7 @@ private:
     std::vector<CmakeProject> subProjects,
     std::vector<std::string> includeFiles,
     std::vector<std::string> sourceFiles,
-    std::vector<CmakeLibrary> libraries
+    std::vector<CmakePackage> packages
   );
 
   std::string name_;
@@ -61,7 +61,7 @@ private:
   std::vector<CmakeProject> subProjects_;
   std::vector<std::string> includeFiles_;
   std::vector<std::string> sourceFiles_;
-  std::vector<CmakeLibrary> libraries_;
+  std::vector<CmakePackage> packages_;
 };
 
 #endif
