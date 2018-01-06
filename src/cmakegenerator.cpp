@@ -43,7 +43,7 @@ bool confirmationInput(IoHandler& ioHandler) {
 CmakeProject createSubProject(IoHandler& ioHandler, const std::string& projectName) {
   ioHandler.write(PROJECT_TYPE_QUESTION);
   const auto projectType = getProjectType(ioHandler);
-  return CmakeProject::createSubProject(projectName, projectType, file_utils::getIncludeFiles(projectName), file_utils::getSourceFiles(projectName), {});
+  return CmakeProject::createSubProject(projectName, projectType, true, file_utils::getIncludeFiles(projectName), file_utils::getSourceFiles(projectName), {}, {});
 }
 
 }
@@ -93,10 +93,10 @@ CmakeProject CmakeGenerator::run() {
         subProjects.push_back(createSubProject(ioHandler_, projectName));
       }
     }
-    return CmakeProject::createBaseProjectWithSubProjects(projectName, baseSettings, subProjects, {});
+    return CmakeProject::createBaseProjectWithSubProjects(projectName, baseSettings, subProjects, {}, {});
   } else {
     ioHandler_.write(PROJECT_TYPE_QUESTION);
     const auto projectType = getProjectType(ioHandler_);
-    return CmakeProject::createBaseProject(projectName, projectType, baseSettings, {}, {}, {});
+    return CmakeProject::createBaseProject(projectName, projectType, baseSettings, {}, {}, {}, {});
   }
 }

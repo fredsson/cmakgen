@@ -1,5 +1,5 @@
-#ifndef CMAKE_LIBRARY_H
-#define CMAKE_LIBRARY_H
+#ifndef CMAKE_PACKAGE_H
+#define CMAKE_PACKAGE_H
 #include <vector>
 #include <string>
 #include <optional>
