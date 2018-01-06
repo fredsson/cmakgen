@@ -330,22 +330,18 @@ std::optional<CmakeProject> load(std::shared_ptr<std::ifstream> fileStream, bool
     }
 
     if (std::regex_match(content, LINK_TARGET_EXPRESSION)) {
-      std::cout << "found target expression\n";
       const std::regex parameterRegex = std::regex("target_link_libraries.*\\((.*)\\)");
       std::optional<std::string> extractedParameters = extractWithExpression(content, parameterRegex);
       if (extractedParameters.has_value()) {
         const auto parameters = split(extractedParameters.value());
         for (auto i = 1; i < parameters.size(); i++) {
-          std::cout << "trying " << parameters[i] << "\n";
           const auto isPackage = std::any_of(packages.begin(), packages.end(), [param = parameters[i]](const CmakePackage& package) {
             return package.name().find(param) != std::string::npos;
           });
           const auto isLibrary = std::any_of(libraries.begin(), libraries.end(), [param = parameters[i]](const CmakeLibrary& library) {
             return library.name().find(param) != std::string::npos;
           });
-          std::cout << "isPackage " << isPackage << " is library " << isLibrary << "\n";
           if (!isPackage && !isLibrary) {
-            std::cout << "is not library or package\n";
             libraries.push_back(CmakeLibrary{parameters[i], true, {}});
           }
         }
