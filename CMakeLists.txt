@@ -43,6 +43,16 @@ set (CMAKE_GENERATOR_SRC
   "src/commandlineutils.cpp"
 )
 
+
 add_executable (cmake_generator ${CMAKE_GENERATOR_INCLUDE} ${CMAKE_GENERATOR_SRC})
 
+set_target_properties (cmake_generator PROPERTIES OUTPUT_NAME "cmakgen")
 target_link_libraries(cmake_generator stdc++fs)
+
+install (
+        TARGETS
+        cmake_generator
+        RUNTIME DESTINATION bin
+        LIBRARY DESTINATION lib
+        ARCHIVE DESTINATION lib/static
+        )
