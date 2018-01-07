@@ -28,11 +28,15 @@ namespace {
     return projectFolders;
   }
 
-  std::vector<std::string> getFiles(const filesystem::path& path, const std::string& extension) {
+  std::vector<std::string> getFiles(const filesystem::path& path, const std::string& subFolderName, const std::string& extension) {
     std::vector<std::string> files = {};
     for (const auto& entry : filesystem::directory_iterator(path)) {
+      if (entry.status().type() == filesystem::file_type::directory) {
+        std::vector<std::string> subFiles = getFiles(entry.path(), entry.path().filename(), extension);
+        files.insert(files.end(), subFiles.begin(), subFiles.end());
+      }
       if (entry.path().extension().generic_string() == extension) {
-        files.push_back(entry.path().filename());
+        files.push_back(subFolderName + "/" + entry.path().filename().generic_string());
       }
     }
     return files;
@@ -50,11 +54,11 @@ namespace file_utils {
   }
 
   std::vector<std::string> getIncludeFiles(const std::string& subFolderName) {
-    return getFiles(filesystem::current_path().append(subFolderName + "/include"), ".h");
+    return getFiles(filesystem::current_path().append(subFolderName + "/include"), "", ".h");
   }
 
   std::vector<std::string> getSourceFiles(const std::string& subFolderName) {
-    return getFiles(filesystem::current_path().append(subFolderName + "/src"), ".cpp");
+    return getFiles(filesystem::current_path().append(subFolderName + "/src"), "", ".cpp");
   }
 
   void createDir(const std::string& name) {
