@@ -41,6 +41,11 @@ std::string upperCase(std::string subject) {
   return subject;
 }
 
+std::string lowerCase(std::string subject) {
+  std::transform(subject.begin(), subject.end(), subject.begin(), ::tolower);
+  return subject;
+}
+
 std::optional<std::string> extractWithExpression(const std::string& content, const std::regex& expression) {
   try {
     std::smatch match;
@@ -335,11 +340,12 @@ std::optional<CmakeProject> load(std::shared_ptr<std::ifstream> fileStream, bool
       if (extractedParameters.has_value()) {
         const auto parameters = split(extractedParameters.value());
         for (auto i = 1; i < parameters.size(); i++) {
-          const auto isPackage = std::any_of(packages.begin(), packages.end(), [param = parameters[i]](const CmakePackage& package) {
-            return package.name().find(param) != std::string::npos;
+          const auto param = lowerCase(parameters[i]);
+          const auto isPackage = std::any_of(packages.begin(), packages.end(), [param](const CmakePackage& package) {
+            return param.find(package.name()) != std::string::npos;
           });
-          const auto isLibrary = std::any_of(libraries.begin(), libraries.end(), [param = parameters[i]](const CmakeLibrary& library) {
-            return library.name().find(param) != std::string::npos;
+          const auto isLibrary = std::any_of(libraries.begin(), libraries.end(), [param](const CmakeLibrary& library) {
+            return param.find(library.name()) != std::string::npos;
           });
           if (!isPackage && !isLibrary) {
             libraries.push_back(CmakeLibrary{parameters[i], true, {}});
