@@ -1,14 +1,19 @@
-#ifndef CMAKE_FILE_H
-#define CMAKE_FILE_H
-#include <fstream>
+#ifndef CMAKEFILE_H
+#define CMAKEFILE_H
 #include <memory>
-#include <optional>
+#include <string>
+#include <vector>
 
-#include "cmakeproject.h"
+class CmakeFunction;
+class CmakeFile {
+public:
+  CmakeFile(std::string path, std::vector<std::shared_ptr<CmakeFunction>> functions);
 
-namespace CmakeFile {
-  void save(std::shared_ptr<std::ofstream> fileStream, const CmakeProject& project);
-  std::optional<CmakeProject> load(std::shared_ptr<std::ifstream> fileStream, bool hasParent);
+  const std::string& path() const;
+  const std::vector<std::shared_ptr<CmakeFunction>>& functions() const;
+private:
+  std::string path_;
+  std::vector<std::shared_ptr<CmakeFunction>> functions_;
 };
 
 #endif

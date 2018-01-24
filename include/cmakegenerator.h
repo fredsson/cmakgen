@@ -1,6 +1,8 @@
 #ifndef CMAKE_GENERATOR_H
 #define CMAKE_GENERATOR_H
-#include "cmakeproject.h"
+#include <memory>
+#include <vector>
+
 
 class IoHandler {
 public:
@@ -22,10 +24,11 @@ private:
   std::vector<std::string> subProjectNames_;
 };
 
+class CmakeFile;
 class CmakeGenerator {
 public:
   CmakeGenerator(IoHandler& ioHandler, GeneratorSettings settings);
-  CmakeProject run();
+  std::shared_ptr<CmakeFile> run();
 private:
   IoHandler& ioHandler_;
   GeneratorSettings settings_;

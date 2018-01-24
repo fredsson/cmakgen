@@ -2,6 +2,7 @@ cmake_minimum_required (VERSION 2.8.9)
 
 project (cmake_generator)
 
+#[[this is a test comment :)]]
 if (NOT CMAKE_BUILD_TYPE)
   message ("-- No Build type set: defaulting to Debug")
   set (CMAKE_BUILD_TYPE Debug)
@@ -23,26 +24,25 @@ add_library(stdc++fs UNKNOWN IMPORTED)
 set_property(TARGET stdc++fs PROPERTY IMPORTED_LOCATION "/usr/lib/libstdc++fs.a")
 
 set (CMAKE_GENERATOR_INCLUDE
-  "include/basecmakesettings.h"
-  "include/cmakepackage.h"
-  "include/cmakelibrary.h"
-  "include/cmakeproject.h"
-  "include/cmakegenerator.h"
+  "include/parser/cmlistfilelexer.h"
   "include/cmakefile.h"
+  "include/cmakefunction.h"
+  "include/parser/cmakeparser.h"
+  "include/writer/cmakewriter.h"
   "include/fileutils.h"
-  "include/commandlineutils.h"
+  "include/cmakegenerator.h"
 )
+set_source_files_properties(src/parser/cmlistfilelexer.c PROPERTIES COMPILE_FLAGS "-DYY_NO_INPUT -DYY_NO_UNPUT")
 
 set (CMAKE_GENERATOR_SRC
-  "src/main.cpp"
-  "src/basecmakesettings.cpp"
-  "src/cmakepackage.cpp"
-  "src/cmakelibrary.cpp"
-  "src/cmakeproject.cpp"
-  "src/cmakegenerator.cpp"
+  "src/parser/cmlistfilelexer.c"
   "src/cmakefile.cpp"
+  "src/cmakefunction.cpp"
+  "src/parser/cmakeparser.cpp"
+  "src/writer/cmakewriter.cpp"
   "src/fileutils.cpp"
-  "src/commandlineutils.cpp"
+  "src/cmakegenerator.cpp"
+  "src/main.cpp"
 )
 
 
