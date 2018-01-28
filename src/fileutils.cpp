@@ -29,17 +29,21 @@ namespace {
   }
 
   std::vector<std::string> getFiles(const filesystem::path& path, const std::string& subFolderName, const std::string& extension) {
-    std::vector<std::string> files = {};
-    for (const auto& entry : filesystem::directory_iterator(path)) {
-      if (entry.status().type() == filesystem::file_type::directory) {
-        std::vector<std::string> subFiles = getFiles(entry.path(), entry.path().filename().generic_string() + "/", extension);
-        files.insert(files.end(), subFiles.begin(), subFiles.end());
+    try {
+      std::vector<std::string> files = {};
+      for (const auto& entry : filesystem::directory_iterator(path)) {
+        if (entry.status().type() == filesystem::file_type::directory) {
+          std::vector<std::string> subFiles = getFiles(entry.path(), entry.path().filename().generic_string() + "/", extension);
+          files.insert(files.end(), subFiles.begin(), subFiles.end());
+        }
+        if (entry.path().extension().generic_string() == extension) {
+          files.push_back(subFolderName + entry.path().filename().generic_string());
+        }
       }
-      if (entry.path().extension().generic_string() == extension) {
-        files.push_back(subFolderName + entry.path().filename().generic_string());
-      }
+      return files;
+    } catch (filesystem::filesystem_error e) {
+      return {};
     }
-    return files;
   }
 }
 
