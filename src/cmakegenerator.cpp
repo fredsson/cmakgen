@@ -1,16 +1,11 @@
 #include "../include/cmakegenerator.h"
-#include "../include/cmakeproject.h"
 #include "../include/fileutils.h"
+#include "../include/cmakefile.h"
+#include "../include/cmakefunction.h"
 #include <algorithm>
+#include "../include/parser/cmakeparser.h"
 
 namespace {
-std::string WELCOME_MESSAGE = "Welcome to the cmakgen\nThis tool will guide you through the process of configuring all the CMakeLists.txt files needed for your cpp project";
-std::string PROJECT_NAME_QUESTION = "What is the project called?";
-std::string PROJECT_CMAKE_VERSION_QUESTION = "CMake version?";
-std::string PROJECT_CPP_VERSION_QESTION = "Default c++ version?";
-std::string PROJECT_TYPE_QUESTION = "Project type? (exe/lib)";
-std::string SUB_PROJECT_QUESTION_PRE = "Found src folder for ";
-std::string SUB_PROJECT_QUESTION_SUB = ", include it in cmake file? (y/n)";
 
 std::string lowerCaseInput(IoHandler& ioHandler) {
   auto input = ioHandler.input();
@@ -18,9 +13,16 @@ std::string lowerCaseInput(IoHandler& ioHandler) {
   return input;
 }
 
-std::optional<std::string> getOptionalInput(IoHandler& ioHandler) {
-  const auto input = ioHandler.input();
-  return input.size() ? std::make_optional(input) : std::nullopt;
+std::string getOptionalInput(const std::string& input, const std::string& defaultValue) {
+  return input.empty() ? defaultValue : input;
+}
+
+bool confirmationInput(IoHandler& ioHandler) {
+  auto input = lowerCaseInput(ioHandler);
+  while (input != "y" && input != "n") {
+    input = lowerCaseInput(ioHandler);
+  }
+  return input == "y" ? true : false;
 }
 
 std::string getProjectType(IoHandler& ioHandler) {
@@ -32,18 +34,60 @@ std::string getProjectType(IoHandler& ioHandler) {
   return input;
 }
 
-bool confirmationInput(IoHandler& ioHandler) {
-  auto input = lowerCaseInput(ioHandler);
-  while (input != "y" && input != "n") {
-    input = lowerCaseInput(ioHandler);
-  }
-  return input == "y" ? true : false;
-}
+void generateCmakeFile(
+  IoHandler& ioHandler,
+  const std::string& name,
+  const std::string& cmakeVersion,
+  const std::string& cppVersion,
+  const std::vector<std::string>& subProjectNames,
+  bool subProject
+) {
+  const auto filePath = subProject ? name + "/CMakeLists.txt" : "CMakeLists.txt";
+  std::ofstream stream(filePath);
 
-CmakeProject createSubProject(IoHandler& ioHandler, const std::string& projectName) {
-  ioHandler.write(PROJECT_TYPE_QUESTION);
-  const auto projectType = getProjectType(ioHandler);
-  return CmakeProject::createSubProject(projectName, projectType, true, file_utils::getIncludeFiles(projectName), file_utils::getSourceFiles(projectName), {}, {});
+  if (!subProject) {
+    ioHandler.write("CMake version? (" + cmakeVersion + ")");
+    stream << "cmake_minimum_required(VERSION " << getOptionalInput(ioHandler.input(), cmakeVersion) << ")\n\n";
+  }
+
+  ioHandler.write("What is the project called? (" + name + ")");
+  stream << "project(" << getOptionalInput(ioHandler.input(), name) << ")\n\n";
+
+  if (!subProject) {
+    ioHandler.write("C++ version? (" + cppVersion + ")");
+    const auto usedCppVersion = getOptionalInput(ioHandler.input(), cppVersion);
+    stream << "include(CheckCXXCompilerFlag)\ncheck_cxx_compiler_flag(\"-std=" << usedCppVersion << "\" COMPILER_SUPPORT_CPP)\n";
+    stream << "if(COMPILER_SUPPORT_CPP)\n\tset(CMAKE_CXX_FLAGS \"${CMAKE_CXX_FLAGS} -std="<< usedCppVersion <<"\")\nendif()\n\n";
+  }
+
+  const auto includeFiles = file_utils::getIncludeFiles(subProject ? name : ".");
+  const auto srcFiles = file_utils::getSourceFiles(subProject ? name : ".");
+
+  if (!includeFiles.empty()) {
+    stream << "set(INCLUDE_FILES\n";
+    for (const auto& file : includeFiles) { stream << "\t\"include/" << file << "\"\n"; }
+    stream << ")\n\n";
+  }
+
+  if (!srcFiles.empty()) {
+    stream << "set(SRC_FILES\n";
+    for (const auto& file : srcFiles) { stream << "\t\"src/" << file << "\"\n";}
+    stream << ")\n\n";
+  }
+
+  for (const auto& subProjectName : subProjectNames) {
+    stream << "add_subdirectory(" << subProjectName << ")\n\n";
+  }
+  
+  if (subProjectNames.empty() || !includeFiles.empty() || !srcFiles.empty()) {
+    ioHandler.write("Project type? (lib/exe)");
+    const auto projectType = getProjectType(ioHandler);
+    stream << (projectType.find("lib") != std::string::npos ? "add_library(" + name  : "add_executable(" + name);
+    if (!includeFiles.empty()) { stream << " ${INCLUDE_FILES}"; }
+    if (!srcFiles.empty()) { stream << " ${SRC_FILES}"; }
+
+    stream << ")\n";
+  } 
 }
 
 }
@@ -72,31 +116,22 @@ CmakeGenerator::CmakeGenerator(IoHandler& ioHandler, GeneratorSettings settings)
   : ioHandler_(ioHandler), settings_(settings) {
 }
 
-CmakeProject CmakeGenerator::run() {
-  ioHandler_.write(WELCOME_MESSAGE);
+void CmakeGenerator::run() {
+  std::ofstream stream ("CMakeLists.txt");
+  if (!stream.is_open()) {
+    ioHandler_.write("Could not open CMakeLists.txt for writing\n");
+    return;
+  }
 
-  ioHandler_.write(PROJECT_NAME_QUESTION + " (" + settings_.defaultProjectName() + ")");
-  const auto projectName = getOptionalInput(ioHandler_).value_or(settings_.defaultProjectName());
+  ioHandler_.write("Welcome to the cmakgen\n");
+  ioHandler_.write("This tool will guide you through the process of configuring all the CMakeLists.txt files needed for your cpp project\n");
 
-  ioHandler_.write(PROJECT_CMAKE_VERSION_QUESTION + " (" + settings_.installedCmakeVersion() + ")");
-  const auto projectCmakeVersion = getOptionalInput(ioHandler_).value_or(settings_.installedCmakeVersion());
+  generateCmakeFile(ioHandler_, settings_.defaultProjectName(), settings_.installedCmakeVersion(), settings_.defaultCppVersion(), settings_.subProjectNames(), false);
 
-  ioHandler_.write(PROJECT_CPP_VERSION_QESTION + " (" + settings_.defaultCppVersion() + ")");
-  const auto projectCppVersion = getOptionalInput(ioHandler_).value_or(settings_.defaultCppVersion());
-
-  const auto baseSettings = BaseCmakeSettings{"Debug", projectCmakeVersion, projectCppVersion};
-  if (settings_.subProjectNames().size() > 0) {
-    std::vector<CmakeProject> subProjects = {};
-    for (const auto& projectName : settings_.subProjectNames()) {
-      ioHandler_.write(SUB_PROJECT_QUESTION_PRE + projectName + SUB_PROJECT_QUESTION_SUB);
-      if (confirmationInput(ioHandler_)) {
-        subProjects.push_back(createSubProject(ioHandler_, projectName));
-      }
+  for (const auto& subProjectName : settings_.subProjectNames()) {
+    ioHandler_.write("Found src folder for " + subProjectName + ", include it in cmake file? (y/n)");
+    if (confirmationInput(ioHandler_)) {
+      generateCmakeFile(ioHandler_, subProjectName, "", "", {}, true);      
     }
-    return CmakeProject::createBaseProjectWithSubProjects(projectName, baseSettings, subProjects, {}, {});
-  } else {
-    ioHandler_.write(PROJECT_TYPE_QUESTION);
-    const auto projectType = getProjectType(ioHandler_);
-    return CmakeProject::createBaseProject(projectName, projectType, baseSettings, {}, {}, {}, {});
   }
 }

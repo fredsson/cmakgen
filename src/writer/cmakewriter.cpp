@@ -53,9 +53,9 @@ void write(const CmakeFile& file) {
   for (const auto& function : file.functions()) {
     position = advanceToPosition(stream, position, {function->line(), function->column()});
 
-    stream << function->name() << " (";
+    stream << function->name() << "(";
   
-    position.column += function->name().size() + 2;
+    position.column += function->name().size() + 1;
 
     for (const auto& argument : function->arguments()) {
       position = writeFunctionArgument(stream, argument, position);

@@ -28,7 +28,7 @@ class CmakeFile;
 class CmakeGenerator {
 public:
   CmakeGenerator(IoHandler& ioHandler, GeneratorSettings settings);
-  std::shared_ptr<CmakeFile> run();
+  void run();
 private:
   IoHandler& ioHandler_;
   GeneratorSettings settings_;
