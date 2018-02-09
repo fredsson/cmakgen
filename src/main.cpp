@@ -1,13 +1,14 @@
 #include <iostream>
-/*#include "../include/cmakeproject.h"*/
+#include <map>
+
 #include "../include/cmakegenerator.h"
 #include "../include/fileutils.h"
-#include <map>
-/*#include "../include/commandlineutils.h"*/
+#include "../include/commandlineutils.h"
 #include "../include/cmakefile.h"
 #include "../include/cmakefunction.h"
 #include "../include/parser/cmakeparser.h"
 #include "../include/writer/cmakewriter.h"
+
 class StdIoHandler : public IoHandler {
 public:
   StdIoHandler() {}
@@ -27,6 +28,7 @@ void buildProject() {
 
   const auto cmakeFile = CmakeParser::parse("CMakeLists.txt");
   if (cmakeFile) {
+    cmakeFile->updateFiles(file_utils::getIncludeFiles(""), file_utils::getSourceFiles(""));
     CmakeWriter::write(*cmakeFile);
   } else {
     std::cout << "could not load cmake file!\n";
@@ -35,12 +37,13 @@ void buildProject() {
   for (const auto& subFolder : file_utils::getSubProjectDirectories()) {
    const auto cmakeFile = CmakeParser::parse(subFolder + "/CMakeLists.txt");
     if (cmakeFile) {
+      cmakeFile->updateFiles(file_utils::getIncludeFiles(subFolder), file_utils::getSourceFiles(subFolder));
       CmakeWriter::write(*cmakeFile);
     } else {
       std::cout << "could not load cmake file!\n";
     } 
   }
-  //commandline_utils::executeBuildCommand();
+  commandline_utils::executeBuildCommand();
 }
 
 void generateCmake(IoHandler& ioHandler, const std::string& defaultCmake, const std::string& defaultCppVersion) {

@@ -30,6 +30,7 @@ set (CMAKE_GENERATOR_INCLUDE
   "include/parser/cmakeparser.h"
   "include/writer/cmakewriter.h"
   "include/fileutils.h"
+  "include/commandlineutils.h"
   "include/cmakegenerator.h"
 )
 set_source_files_properties(src/parser/cmlistfilelexer.c PROPERTIES COMPILE_FLAGS "-DYY_NO_INPUT -DYY_NO_UNPUT")
@@ -41,6 +42,7 @@ set (CMAKE_GENERATOR_SRC
   "src/parser/cmakeparser.cpp"
   "src/writer/cmakewriter.cpp"
   "src/fileutils.cpp"
+  "src/commandlineutils.cpp"
   "src/cmakegenerator.cpp"
   "src/main.cpp"
 )

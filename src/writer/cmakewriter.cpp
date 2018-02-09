@@ -40,6 +40,24 @@ FilePosition writeFunctionArgument(std::ofstream& stream, const CmakeFunctionArg
 
   return {position.line, position.column + argumentSize};
 }
+
+FilePosition writeFunction(std::ofstream& stream, const std::shared_ptr<CmakeFunction>& function, const FilePosition& currentPosition) {
+  auto position = advanceToPosition(stream, currentPosition, {function->line(), function->column()});
+
+  stream << function->name() << "(";
+
+  position.column += function->name().size() + 1;
+
+  for (const auto& argument : function->arguments()) {
+    position = writeFunctionArgument(stream, argument, position);
+  }
+
+  position = advanceToPosition(stream, position, {function->endLine(), function->endColumn()});
+
+  stream << ")";
+
+  return position;
+}
 }
 
 void write(const CmakeFile& file) {
@@ -51,20 +69,7 @@ void write(const CmakeFile& file) {
 
   auto position = FilePosition{1, 1};
   for (const auto& function : file.functions()) {
-    position = advanceToPosition(stream, position, {function->line(), function->column()});
-
-    stream << function->name() << "(";
-  
-    position.column += function->name().size() + 1;
-
-    for (const auto& argument : function->arguments()) {
-      position = writeFunctionArgument(stream, argument, position);
-    }
-
-    position = advanceToPosition(stream, position, {function->endLine(), function->endColumn()});
-
-    stream << ")";
+    position = writeFunction(stream, function, position);
   }
 }
-
 }
