@@ -57,7 +57,7 @@ void generateCmakeFile(
     ioHandler.write("C++ version? (" + cppVersion + ")");
     const auto usedCppVersion = getOptionalInput(ioHandler.input(), cppVersion);
     stream << "include(CheckCXXCompilerFlag)\ncheck_cxx_compiler_flag(\"-std=" << usedCppVersion << "\" COMPILER_SUPPORT_CPP)\n";
-    stream << "if(COMPILER_SUPPORT_CPP)\n\tset(CMAKE_CXX_FLAGS \"${CMAKE_CXX_FLAGS} -std="<< usedCppVersion <<"\")\nendif()\n\n";
+    stream << "if(COMPILER_SUPPORT_CPP)\n  set(CMAKE_CXX_FLAGS \"${CMAKE_CXX_FLAGS} -std="<< usedCppVersion <<"\")\nendif()\n\n";
   }
 
   const auto includeFiles = file_utils::getIncludeFiles(subProject ? name : ".");
@@ -65,13 +65,13 @@ void generateCmakeFile(
 
   if (!includeFiles.empty()) {
     stream << "set(INCLUDE_FILES\n";
-    for (const auto& file : includeFiles) { stream << "\t\"include/" << file << "\"\n"; }
+    for (const auto& file : includeFiles) { stream << "  \"" << file << "\"\n"; }
     stream << ")\n\n";
   }
 
   if (!srcFiles.empty()) {
     stream << "set(SRC_FILES\n";
-    for (const auto& file : srcFiles) { stream << "\t\"src/" << file << "\"\n";}
+    for (const auto& file : srcFiles) { stream << "  \"" << file << "\"\n";}
     stream << ")\n\n";
   }
 
