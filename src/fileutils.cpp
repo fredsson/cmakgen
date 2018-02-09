@@ -28,16 +28,16 @@ namespace {
     return projectFolders;
   }
 
-  std::vector<std::string> getFiles(const filesystem::path& path, const std::string& subFolderName, const std::string& extension) {
+  std::vector<std::string> getFiles(const filesystem::path& path, const std::string& subfolderName, const std::string& fileFolder, const std::string& extension) {
     try {
       std::vector<std::string> files = {};
       for (const auto& entry : filesystem::directory_iterator(path)) {
         if (entry.status().type() == filesystem::file_type::directory) {
-          std::vector<std::string> subFiles = getFiles(entry.path(), entry.path().filename().generic_string() + "/", extension);
+          std::vector<std::string> subFiles = getFiles(entry.path(), entry.path().filename().generic_string() + "/", fileFolder, extension);
           files.insert(files.end(), subFiles.begin(), subFiles.end());
         }
         if (entry.path().extension().generic_string() == extension) {
-          files.push_back(subFolderName + entry.path().filename().generic_string());
+          files.push_back(subfolderName + fileFolder + entry.path().filename().generic_string());
         }
       }
       return files;
@@ -48,12 +48,12 @@ namespace {
 }
 
 namespace file_utils {
-  std::vector<std::string> getIncludeFiles(const std::string& subFolderName) {
-    return getFiles(filesystem::current_path().append(subFolderName + "/include"), "", ".h");
+  std::vector<std::string> getIncludeFiles(const std::string& subfolderName) {
+    return getFiles(filesystem::current_path().append(subfolderName + "/include"), "", "include/", ".h");
   }
 
-  std::vector<std::string> getSourceFiles(const std::string& subFolderName) {
-    return getFiles(filesystem::current_path().append(subFolderName + "/src"), "", ".cpp");
+  std::vector<std::string> getSourceFiles(const std::string& subfolderName) {
+    return getFiles(filesystem::current_path().append(subfolderName + "/src"), "", "src/", ".cpp");
   }
 
   void createDir(const std::string& name) {
