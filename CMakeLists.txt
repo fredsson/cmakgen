@@ -1,8 +1,7 @@
 cmake_minimum_required (VERSION 2.8.9)
 
-project (cmake_generator)
+project (cmakgen)
 
-#[[this is a test comment :)]]
 if (NOT CMAKE_BUILD_TYPE)
   message ("-- No Build type set: defaulting to Debug")
   set (CMAKE_BUILD_TYPE Debug)
@@ -23,7 +22,7 @@ endif ()
 add_library(stdc++fs UNKNOWN IMPORTED)
 set_property(TARGET stdc++fs PROPERTY IMPORTED_LOCATION "/usr/lib/libstdc++fs.a")
 
-set (CMAKE_GENERATOR_INCLUDE
+set (CMAKGEN_INCLUDE
   "include/parser/cmlistfilelexer.h"
   "include/cmakefile.h"
   "include/cmakefunction.h"
@@ -36,7 +35,7 @@ set (CMAKE_GENERATOR_INCLUDE
 
 set_source_files_properties(src/parser/cmlistfilelexer.c PROPERTIES COMPILE_FLAGS "-DYY_NO_INPUT -DYY_NO_UNPUT")
 
-set (CMAKE_GENERATOR_SRC
+set (CMAKGEN_SRC
   "src/parser/cmlistfilelexer.c"
   "src/cmakefile.cpp"
   "src/cmakefunction.cpp"
@@ -49,14 +48,14 @@ set (CMAKE_GENERATOR_SRC
 )
 
 
-add_executable (cmake_generator ${CMAKE_GENERATOR_INCLUDE} ${CMAKE_GENERATOR_SRC})
+add_executable (cmakgen ${CMAKGEN_INCLUDE} ${CMAKGEN_SRC})
 
-set_target_properties (cmake_generator PROPERTIES OUTPUT_NAME "cmakgen")
-target_link_libraries(cmake_generator stdc++fs)
+set_target_properties (cmakgen PROPERTIES OUTPUT_NAME "cmakgen")
+target_link_libraries(cmakgen stdc++fs)
 
 install (
   TARGETS
-  cmake_generator
+  cmakgen
   RUNTIME DESTINATION bin
   LIBRARY DESTINATION lib
   ARCHIVE DESTINATION lib/static
