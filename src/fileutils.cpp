@@ -37,7 +37,7 @@ namespace {
           files.insert(files.end(), subFiles.begin(), subFiles.end());
         }
         if (entry.path().extension().generic_string() == extension) {
-          files.push_back(subfolderName + fileFolder + entry.path().filename().generic_string());
+          files.push_back(fileFolder + subfolderName + entry.path().filename().generic_string());
         }
       }
       return files;
