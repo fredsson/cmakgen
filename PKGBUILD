@@ -1,6 +1,6 @@
 #Maintainer: Fredrik Andersson <fredrik.ks.andersson@gmail.com>
 pkgname=cmakgen
-pkgver=1.1.0
+pkgver=1.1.1
 pkgrel=1
 pkgdesc="Tool to automatically generate cmake files for c++ projects"
 arch=("x86_64")
