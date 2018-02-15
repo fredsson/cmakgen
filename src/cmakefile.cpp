@@ -89,6 +89,11 @@ const std::vector<std::shared_ptr<CmakeFunction>>& CmakeFile::functions() const 
 }
 
 void CmakeFile::updateFiles(const std::vector<std::string>& includeFiles, const std::vector<std::string>& srcFiles) {
+  // don't update if there are no files
+  if (includeFiles.empty() && srcFiles.empty()) {
+    return;
+  }
+
   const auto includeFilesFunction = findFunction(functions_, "set", "INCLUDE_FILES");
   const auto srcFilesFunction = findFunction(functions_, "set", "SRC_FILES");
 
