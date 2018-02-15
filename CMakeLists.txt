@@ -33,6 +33,7 @@ set (CMAKE_GENERATOR_INCLUDE
   "include/commandlineutils.h"
   "include/cmakegenerator.h"
 )
+
 set_source_files_properties(src/parser/cmlistfilelexer.c PROPERTIES COMPILE_FLAGS "-DYY_NO_INPUT -DYY_NO_UNPUT")
 
 set (CMAKE_GENERATOR_SRC
@@ -54,9 +55,9 @@ set_target_properties (cmake_generator PROPERTIES OUTPUT_NAME "cmakgen")
 target_link_libraries(cmake_generator stdc++fs)
 
 install (
-        TARGETS
-        cmake_generator
-        RUNTIME DESTINATION bin
-        LIBRARY DESTINATION lib
-        ARCHIVE DESTINATION lib/static
-        )
+  TARGETS
+  cmake_generator
+  RUNTIME DESTINATION bin
+  LIBRARY DESTINATION lib
+  ARCHIVE DESTINATION lib/static
+)
